@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+    branches: ["*"]
+  push:
+    branches: ["develop"]
+  merge_group:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/setup
+
+      - name: Lint
+        run: pnpm next lint
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/setup
+
+      - name: Format
+        run: pnpm format:check
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: setup
+        uses: ./.github/setup
+
+      - name: Typecheck
+        run: pnpm type:check
+
+  comment-if-failed:
+    if: ${{ always() }}
+    needs: [lint, format, typecheck]
+    permissions: write-all
+    runs-on: ubuntu-latest
+    steps:
+      - uses: juliusmarminge/gh-failed-action-commenter@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          FIXES: '{ "format": "format", "lint": "lint:fix" }'
