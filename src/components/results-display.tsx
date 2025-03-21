@@ -1,6 +1,7 @@
 "use client";
 
 import { Copy, Download, RefreshCw } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 import { useToast } from "@/hooks/use-toast";
 import { Badge } from "@/components/ui/badge";
@@ -177,7 +178,7 @@ export default function ResultsDisplay({
 						</CardHeader>
 						<CardContent>
 							<div className="max-h-96 overflow-y-auto whitespace-pre-line rounded-md bg-muted p-4">
-								{results.transcription}
+								<ReactMarkdown>{results.transcription}</ReactMarkdown>
 							</div>
 						</CardContent>
 					</Card>
