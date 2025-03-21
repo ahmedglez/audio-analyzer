@@ -46,8 +46,8 @@ export default function ProcessingStatus({
 			<Loader2 className="mb-6 size-12 animate-spin text-primary" />
 			<h2 className="mb-4 text-2xl font-semibold">Procesando audio</h2>
 			<p className="max-w-md text-center text-muted-foreground">
-				El procesamiento puede tomar aproximadamente 40 segundos. Por favor, no
-				cierres esta ventana.
+				El procesamiento puede tomar algunos minutos. Por favor, no cierres esta
+				ventana.
 			</p>
 		</div>
 	);
