@@ -118,6 +118,11 @@ export default function ResultsDisplay({
 									{results.analysis.clientObjections.map((objection, index) => (
 										<li key={index}>{objection}</li>
 									))}
+									{results.analysis.clientObjections.length === 0 && (
+										<li className="text-muted-foreground">
+											No se detectaron objeciones
+										</li>
+									)}
 								</ul>
 							</div>
 
@@ -136,7 +141,10 @@ export default function ResultsDisplay({
 
 							<div>
 								<h3 className="mb-3 text-lg font-medium">Tono emocional</h3>
-								<p>{results.analysis.emotionalTone}</p>
+								<p>
+									{results.analysis.emotionalTone ||
+										"No se detectó tono emocional"}
+								</p>
 							</div>
 							{results.analysis.customAnalysis &&
 								results.analysis.customAnalysis.length > 0 && (
