@@ -4,6 +4,7 @@ import type React from "react";
 import { useState } from "react";
 import { FileAudio, Plus, X } from "lucide-react";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
@@ -78,6 +79,12 @@ export default function AnalysisRequirements({
 		}
 	};
 
+	const hasRequirements =
+		predefinedRequirements.length > 0 || customRequirements.length > 0;
+	const hasSelectedRequirements =
+		predefinedRequirements.some((req) => req.selected) ||
+		customRequirements.length > 0;
+
 	return (
 		<div className="space-y-6">
 			<div className="flex items-center gap-3 text-muted-foreground">
@@ -90,23 +97,33 @@ export default function AnalysisRequirements({
 					Selecciona los requisitos de análisis
 				</h2>
 
-				<div className="mb-6 space-y-3">
-					{predefinedRequirements.map((req) => (
-						<div key={req.id} className="flex items-start space-x-2">
-							<Checkbox
-								id={`req-${req.id}`}
-								checked={req.selected}
-								onCheckedChange={() => togglePredefinedRequirement(req.id)}
-							/>
-							<Label
-								htmlFor={`req-${req.id}`}
-								className="cursor-pointer text-base leading-relaxed"
-							>
-								{req.text}
-							</Label>
-						</div>
-					))}
-				</div>
+				{predefinedRequirements.length > 0 ? (
+					<div className="mb-6 space-y-3">
+						<h3 className="text-lg font-medium">Requisitos predefinidos</h3>
+						{predefinedRequirements.map((req) => (
+							<div key={req.id} className="flex items-start space-x-2">
+								<Checkbox
+									id={`req-${req.id}`}
+									checked={req.selected}
+									onCheckedChange={() => togglePredefinedRequirement(req.id)}
+								/>
+								<Label
+									htmlFor={`req-${req.id}`}
+									className="cursor-pointer text-base leading-relaxed"
+								>
+									{req.text}
+								</Label>
+							</div>
+						))}
+					</div>
+				) : (
+					<Alert className="mb-6">
+						<AlertDescription>
+							No hay requisitos predefinidos configurados. Puedes añadirlos
+							desde la configuración o usar requisitos personalizados.
+						</AlertDescription>
+					</Alert>
+				)}
 
 				<div className="space-y-4">
 					<h3 className="text-lg font-medium">Requisitos personalizados</h3>
@@ -119,12 +136,8 @@ export default function AnalysisRequirements({
 							id="custom-requirement"
 							placeholder="Escribe requisitos personalizados detallados para el análisis..."
 							value={newRequirement}
-							onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-								setNewRequirement(e.target.value)
-							}
-							onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) =>
-								handleKeyDown(e)
-							}
+							onChange={(e) => setNewRequirement(e.target.value)}
+							onKeyDown={handleKeyDown}
 							className="min-h-[120px] resize-y"
 						/>
 						<p className="mt-1 text-xs text-muted-foreground">
@@ -192,7 +205,9 @@ export default function AnalysisRequirements({
 			</div>
 
 			<div className="flex justify-end pt-4">
-				<Button onClick={onSubmit}>Analizar audio</Button>
+				<Button onClick={onSubmit} disabled={!hasSelectedRequirements}>
+					Analizar audio
+				</Button>
 			</div>
 		</div>
 	);

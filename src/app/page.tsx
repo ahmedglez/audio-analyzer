@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Settings } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
@@ -15,36 +15,10 @@ import { Button } from "@/components/ui/button";
 export default function AudioAnalyzer() {
 	const [step, setStep] = useState(1);
 	const [audioFile, setAudioFile] = useState<File | null>(null);
+	const [customRequirements, setCustomRequirements] = useState<string[]>([]);
 	const [predefinedRequirements, setPredefinedRequirements] = useState<
 		Array<{ id: string; text: string; selected: boolean }>
-	>([
-		{
-			id: "prohibited",
-			text: "Identificar palabras prohibidas",
-			selected: true,
-		},
-		{
-			id: "clientName",
-			text: "Detectar si el agente mencionó el nombre del cliente",
-			selected: true,
-		},
-		{
-			id: "objections",
-			text: "Verificar si el cliente presentó objeciones",
-			selected: true,
-		},
-		{
-			id: "discount",
-			text: "Identificar si el agente ofreció un descuento",
-			selected: true,
-		},
-		{
-			id: "tone",
-			text: "Analizar el tono emocional de la llamada",
-			selected: true,
-		},
-	]);
-	const [customRequirements, setCustomRequirements] = useState<string[]>([]);
+	>([]);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -67,6 +41,71 @@ export default function AudioAnalyzer() {
 	const [results, setResults] = useState<AnalysisResults | null>(null);
 	const [isConfigOpen, setIsConfigOpen] = useState(false);
 	const { toast } = useToast();
+
+	// Cargar requisitos predefinidos desde localStorage al iniciar
+	useEffect(() => {
+		const savedRequirements = localStorage.getItem("predefined-requirements");
+		if (savedRequirements) {
+			try {
+				const parsedRequirements = JSON.parse(savedRequirements);
+				setPredefinedRequirements(parsedRequirements);
+			} catch (e) {
+				console.error("Error al cargar requisitos predefinidos:", e);
+				// Si hay un error, inicializar con valores por defecto
+				initializeDefaultRequirements();
+			}
+		} else {
+			// Si no hay requisitos guardados, inicializar con valores por defecto
+			initializeDefaultRequirements();
+		}
+	}, []);
+
+	// Función para inicializar con requisitos por defecto
+	const initializeDefaultRequirements = () => {
+		const defaultRequirements = [
+			{
+				id: "prohibited",
+				text: "Identificar palabras prohibidas",
+				selected: false,
+			},
+			{
+				id: "clientName",
+				text: "Detectar si el agente mencionó el nombre del cliente",
+				selected: false,
+			},
+			{
+				id: "objections",
+				text: "Verificar si el cliente presentó objeciones",
+				selected: false,
+			},
+			{
+				id: "discount",
+				text: "Identificar si el agente ofreció un descuento",
+				selected: false,
+			},
+			{
+				id: "tone",
+				text: "Analizar el tono emocional de la llamada",
+				selected: false,
+			},
+		];
+		setPredefinedRequirements(defaultRequirements);
+		localStorage.setItem(
+			"predefined-requirements",
+			JSON.stringify(defaultRequirements)
+		);
+	};
+
+	// Función para guardar requisitos en localStorage
+	const saveRequirements = (
+		requirements: Array<{ id: string; text: string; selected: boolean }>
+	) => {
+		setPredefinedRequirements(requirements);
+		localStorage.setItem(
+			"predefined-requirements",
+			JSON.stringify(requirements)
+		);
+	};
 
 	const handleFileAccepted = (file: File) => {
 		setAudioFile(file);
@@ -244,6 +283,8 @@ ${results.summary}
 			<ConfigModal
 				isOpen={isConfigOpen}
 				onClose={() => setIsConfigOpen(false)}
+				predefinedRequirements={predefinedRequirements}
+				setPredefinedRequirements={saveRequirements}
 			/>
 		</main>
 	);

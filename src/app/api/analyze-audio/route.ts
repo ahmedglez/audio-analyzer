@@ -30,14 +30,34 @@ export async function POST(req: NextRequest) {
 
 		// Construir el prompt para OpenAI con los requisitos
 		const prompt = `
-            Tienes la siguiente transcripción de una llamada telefónica:
-            "${transcription}"
+      Tienes la siguiente transcripción de una llamada telefónica:
+      "${transcription}"
 
-            Debes analizarla según los siguientes requisitos:
-            ${requirements.map((req, index) => `${index + 1}. ${req}`).join("\n")}
+      Debes analizarla según los siguientes requisitos:
+      ${requirements.map((req, index) => `${index + 1}. ${req}`).join("\n")}
 
-            Devuelve un análisis estructurado en formato JSON.
-        `;
+      Devuelve la respuesta en formato JSON con la siguiente estructura exacta:
+
+      {
+        "transcription": "<transcripción>",
+        "analysis": {
+          "prohibitedWords": ["<palabra1>", "<palabra2>"],
+          "mentionedClientName": <true | false>,
+          "clientObjections": ["<objeción1>", "<objeción2>"],
+          "offeredDiscount": <true | false>,
+          "emotionalTone": "<tono general>",
+          "customAnalysis": [
+            {
+              "requirement": "<nombre del requisito>",
+              "result": "<resultado del análisis>"
+            }
+          ]
+        },
+        "summary": "<resumen>"
+      }
+
+      Asegúrate de devolver las claves exactamente como se especifican arriba.
+`;
 
 		// Llamada a OpenAI para analizar la transcripción
 		const response = await openai.chat.completions.create({
@@ -47,15 +67,13 @@ export async function POST(req: NextRequest) {
 		});
 
 		// Obtener la respuesta generada
-		const analysisRaw = response.choices[0]?.message?.content || "{}";
+		const result = response.choices[0]?.message?.content || "{}";
 
 		// Limpiar delimitadores de código si existen
-		const cleanedAnalysis = analysisRaw.replace(/```json|```/g, "").trim();
+		const cleanedResult = result.replace(/```json|```/g, "").trim();
 
 		return NextResponse.json({
-			transcription,
-			analysis: JSON.parse(analysisRaw),
-			summary: "Resumen generado a partir del análisis de la llamada.",
+			...JSON.parse(cleanedResult),
 		});
 	} catch (error) {
 		console.error("Error en el procesamiento:", error);
