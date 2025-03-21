@@ -45,7 +45,7 @@ export default function ResultsDisplay({
 
 	return (
 		<div className="space-y-6">
-			<div className="flex items-center justify-between">
+			<div className="flex flex-col items-center justify-between space-y-3 md:flex-row md:space-y-0">
 				<h2 className="text-2xl font-semibold">Resultados del análisis</h2>
 				<div className="flex gap-2">
 					<Button variant="outline" onClick={onReset}>
