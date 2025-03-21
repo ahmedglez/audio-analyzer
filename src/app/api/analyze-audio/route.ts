@@ -1,5 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
+import { zodResponseFormat } from "openai/helpers/zod";
+import { z } from "zod";
+
+const TranscriptionSchema = z.object({
+	transcription: z.string(),
+	analysis: z.object({
+		prohibitedWords: z.array(z.string()).optional(),
+		mentionedClientName: z.boolean(),
+		clientObjections: z.array(z.string()).optional(),
+		offeredDiscount: z.boolean(),
+		emotionalTone: z.string(),
+		customAnalysis: z.array(
+			z.object({
+				requirement: z.string(),
+				result: z.string(),
+			})
+		),
+	}),
+	summary: z.string().optional(),
+});
 
 export async function POST(req: NextRequest) {
 	try {
@@ -40,66 +60,57 @@ export async function POST(req: NextRequest) {
 
 		// Construir el prompt para formatear la transcripción y analizarla
 		const prompt = `
-      Tienes la siguiente transcripción de una llamada telefónica:
-      "${rawTranscription}"
+Tienes la siguiente transcripción de una llamada telefónica:
+"${rawTranscription}"
 
-      **Tareas:**
-      1. **Reformatea la transcripción** en estilo diálogo entre "Agente" y "Cliente" usando Markdown, asegurando claridad en cada línea.
-      2. **Realiza un análisis** según los siguientes requisitos:
-         ${requirements.map((req, index) => `${index + 1}. ${req}`).join("\n")}
+**Tareas:**
+1. Reformatea la transcripción en estilo diálogo entre "Agente" y "Cliente".
+2. Realiza un análisis según los siguientes requisitos:
+   ${requirements.map((req, index) => `${index + 1}. ${req}`).join("\n")}
 
-      **Formato de salida esperado (JSON):**
+**Formato de salida esperado (JSON válido):**
+\`\`\`json
+{
+  "transcription": "### Conversación\\n**Agente:** Hola, ¿cómo estás?\\n**Cliente:** Bien, gracias.",
+  "analysis": {
+    "prohibitedWords": ["<palabra1>", "<palabra2>"],
+    "mentionedClientName": <true | false>,
+    "clientObjections": ["<objeción1>", "<objeción2>"],
+    "offeredDiscount": <true | false>,
+    "emotionalTone": "<tono general>",
+    "customAnalysis": [
       {
-        "transcription": "<transcripción en formato markdown>",
-        "analysis": {
-          "prohibitedWords": ["<palabra1>", "<palabra2>"],
-          "mentionedClientName": <true | false>,
-          "clientObjections": ["<objeción1>", "<objeción2>"],
-          "offeredDiscount": <true | false>,
-          "emotionalTone": "<tono general>",
-          "customAnalysis": [
-            {
-              "requirement": "<nombre del requisito>",
-              "result": "<resultado del análisis>"
-            }
-          ]
-        },
-        "summary": "<resumen>"
+        "requirement": "<nombre del requisito>",
+        "result": "<resultado del análisis>"
       }
+    ]
+  },
+  "summary": "<resumen>"
+}
+\`\`\`
 
-      **Ejemplo de transcripción en Markdown:**
-      \`\`\`markdown
-      **Agente:** Hola, buenas tardes. ¿Con quién tengo el gusto?
-
-      **Cliente:** Hola, buenas tardes. Me llamo Kiara.
-
-      **Agente:** Mucho gusto, Kiara. Te llamo para hablar sobre nuestra promoción en Cancún.
-      \`\`\`
-
-      **Reglas:**
-      - Usa negritas para los nombres ("**Agente:**", "**Cliente:**").
-      - Divide bien las líneas para que sea fácil de leer.
-      - Mantén la transcripción lo más fiel posible al original.
-
-      Asegúrate de devolver las claves exactamente como se especifican arriba.
-    `;
+**Reglas:**
+- La transcripción debe ser un solo string en formato Markdown.
+- Usa caracteres de escape (\n y \\) para mantener el formato sin romper el JSON.
+- No devuelvas texto fuera del JSON.
+`;
 
 		// Llamada a OpenAI para analizar y reformatear la transcripción
 		const response = await openai.chat.completions.create({
-			model: "gpt-4-turbo",
+			model: "gpt-4o-mini",
 			messages: [{ role: "system", content: prompt }],
 			temperature: 0.7,
+			response_format: zodResponseFormat(TranscriptionSchema, "transcription"),
 		});
 
 		// Obtener la respuesta generada
-		const result = response.choices[0]?.message?.content || "{}";
+		let result = response.choices[0]?.message?.content || "{}";
 
-		// Limpiar delimitadores de código si existen
-		const cleanedResult = result.replace(/```json|```/g, "").trim();
+		// Limpiar delimitadores de código JSON si existen
+		result = result.replace(/```json|```/g, "").trim();
 
-		return NextResponse.json({
-			...JSON.parse(cleanedResult),
-		});
+		// Devolver la respuesta final como JSON válido
+		return NextResponse.json(JSON.parse(result));
 	} catch (error) {
 		console.error("Error en el procesamiento:", error);
 		return NextResponse.json(

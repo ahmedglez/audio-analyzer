@@ -130,7 +130,7 @@ importers:
         specifier: ^5.3.3
         version: 5.8.2
       zod:
-        specifier: ^3.22.4
+        specifier: ^3.24.2
         version: 3.24.2
 
 packages:
