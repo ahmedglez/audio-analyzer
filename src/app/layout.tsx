@@ -6,7 +6,6 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
 import { Providers } from "@/components/providers";
-import { TailwindIndicator } from "@/components/tailwind-indicator";
 
 export const metadata: Metadata = {
 	title: {
@@ -55,10 +54,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className={cn("min-h-screen antialiased", fontSans.className)}>
-				<Providers>
-					{children}
-					<TailwindIndicator />
-				</Providers>
+				<Providers>{children}</Providers>
 			</body>
 		</html>
 	);
