@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+import { siteConfig } from "@/config";
+
 const Logo = () => {
 	const [isSmallScreen, setIsSmallScreen] = useState(false);
 
@@ -12,10 +14,19 @@ const Logo = () => {
 		return () => window.removeEventListener("resize", handleResize);
 	}, []);
 
+	const handleClick = (e: React.MouseEvent) => {
+		e.preventDefault();
+		window.location.reload();
+	};
+
 	return (
-		<Link href="/" className="flex items-center space-x-2">
-			<img src="/logo.svg" alt="Logo" className="size-12" />
-			{!isSmallScreen && <h1 className="font-bold">Audio Analyzer</h1>}
+		<Link
+			href="/"
+			className="flex cursor-pointer items-center space-x-2"
+			onClick={handleClick}
+		>
+			<img src="/logo.svg" alt="Logo" className="size-12 dark:invert" />
+			{!isSmallScreen && <h1 className="font-bold">{siteConfig.title}</h1>}
 		</Link>
 	);
 };
