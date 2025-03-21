@@ -101,106 +101,53 @@ export default function AudioAnalyzer() {
 		}
 
 		setStep(3);
-		processAudio();
+		processAudio(apiKey);
 	};
 
-	const processAudio = async () => {
-		// In a real implementation, this would send the audio to a server
-		// and process it with OpenAI's API
+	const processAudio = async (userApiKey: string) => {
+		try {
+			setProcessingStatus("transcribing");
 
-		setProcessingStatus("transcribing");
-		await simulateDelay(2000);
+			// Simulamos un tiempo de procesamiento antes de enviar la solicitud
+			await new Promise((resolve) => setTimeout(resolve, 2000));
 
-		setProcessingStatus("analyzing");
+			setProcessingStatus("analyzing");
 
-		// Prepare the requirements for the API request
-		const selectedPredefined = predefinedRequirements
-			.filter((req) => req.selected)
-			.map((req) => req.text);
+			// Preparar los requerimientos para la API
+			const selectedPredefined = predefinedRequirements
+				.filter((req) => req.selected)
+				.map((req) => req.text);
 
-		const allRequirements = [...selectedPredefined, ...customRequirements];
+			const allRequirements = [...selectedPredefined, ...customRequirements];
 
-		console.log("Sending requirements to OpenAI API:", allRequirements);
+			// Llamada al endpoint con los requisitos y la API Key del usuario
+			const response = await fetch("/api/analyze-audio", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${userApiKey}`, // Se asume que `userApiKey` está disponible en el contexto
+				},
+				body: JSON.stringify({ requirements: allRequirements }),
+			});
 
-		await simulateDelay(2000);
+			if (!response.ok) {
+				throw new Error("Error en la solicitud al backend");
+			}
 
-		setProcessingStatus("summarizing");
-		await simulateDelay(1500);
+			// Procesar la respuesta
+			const analysisResults = await response.json();
 
-		// Mock results - in a real implementation, this would come from the OpenAI API
-		// based on the requirements
-		interface AnalysisResults {
-			transcription: string;
-			analysis: {
-				prohibitedWords: string[];
-				mentionedClientName: boolean;
-				clientObjections: string[];
-				offeredDiscount: boolean;
-				emotionalTone: string;
-				customAnalysis: Array<{
-					requirement: string;
-					result: string;
-				}>;
-			};
-			summary: string;
+			setProcessingStatus("summarizing");
+			await new Promise((resolve) => setTimeout(resolve, 1500));
+
+			// Guardamos los resultados y pasamos al siguiente paso
+			setResults(analysisResults);
+			setStep(4);
+		} catch (error) {
+			console.error("Error en el procesamiento del audio:", error);
+			setProcessingStatus("error");
 		}
-
-		const analysisResults: AnalysisResults = {
-			transcription: "Este es un ejemplo de transcripción del audio subido...",
-			analysis: {
-				prohibitedWords: predefinedRequirements.find(
-					(r) => r.id === "prohibited"
-				)?.selected
-					? ["palabra1", "palabra2"]
-					: [],
-				mentionedClientName: predefinedRequirements.find(
-					(r) => r.id === "clientName"
-				)?.selected
-					? true
-					: false,
-				clientObjections: predefinedRequirements.find(
-					(r) => r.id === "objections"
-				)?.selected
-					? ["El precio es muy alto", "Necesito pensarlo"]
-					: [],
-				offeredDiscount: predefinedRequirements.find((r) => r.id === "discount")
-					?.selected
-					? true
-					: false,
-				emotionalTone: predefinedRequirements.find((r) => r.id === "tone")
-					?.selected
-					? "Neutral con momentos de tensión"
-					: "No analizado",
-				customAnalysis:
-					customRequirements.length > 0
-						? customRequirements.map((req) => ({
-								requirement: req,
-								result: `Análisis para: ${req} - Resultado simulado basado en la transcripción.`,
-							}))
-						: [],
-			},
-			summary:
-				"La llamada tuvo una duración de 3:45 minutos. " +
-				(predefinedRequirements.find((r) => r.id === "clientName")?.selected
-					? "El agente mencionó el nombre del cliente correctamente. "
-					: "") +
-				(predefinedRequirements.find((r) => r.id === "objections")?.selected
-					? "Se identificaron objeciones relacionadas con el precio. "
-					: "") +
-				(predefinedRequirements.find((r) => r.id === "discount")?.selected
-					? "El agente ofreció un descuento del 10%. "
-					: "") +
-				(customRequirements.length > 0
-					? "Además, se realizaron análisis personalizados según los requisitos especificados."
-					: ""),
-		};
-
-		setResults(analysisResults);
-		setStep(4);
 	};
-
-	const simulateDelay = (ms: number) =>
-		new Promise((resolve) => setTimeout(resolve, ms));
 
 	const handleReset = () => {
 		setAudioFile(null);
