@@ -276,6 +276,18 @@ ${results.summary}
 		});
 	};
 
+	const handleBack = () => {
+		if (step === 1) return;
+		if (step === 4) {
+			setResults(null);
+			setStep(2);
+		} else {
+			setStep(step - 1);
+		}
+		setError(null);
+		setIsLoading(false);
+	};
+
 	return (
 		<main className="container mx-auto max-w-4xl px-4 py-8">
 			<div className="mb-8 flex items-center justify-between">
@@ -311,7 +323,7 @@ ${results.summary}
 					<ProcessingStatus
 						isLoading={isLoading}
 						error={error}
-						onBack={() => setStep(2)}
+						onBack={handleBack}
 					/>
 				)}
 
