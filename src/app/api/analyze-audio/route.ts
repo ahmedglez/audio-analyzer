@@ -8,10 +8,6 @@ export async function POST(req: NextRequest) {
 		const apiKey = formData.get("apiKey") as string;
 		const requirements = JSON.parse(formData.get("requirements") as string);
 
-		console.log("apiKey", apiKey);
-		console.log("file", file);
-		console.log("requirements", requirements);
-
 		if (!apiKey || !file || !requirements || !Array.isArray(requirements)) {
 			return NextResponse.json(
 				{ error: "apiKey, audio y requirements son obligatorios" },
@@ -32,8 +28,6 @@ export async function POST(req: NextRequest) {
 
 		const transcription = transcriptionResponse.text;
 
-		console.log("transcription", transcription);
-
 		// Construir el prompt para OpenAI con los requisitos
 		const prompt = `
             Tienes la siguiente transcripción de una llamada telefónica:
@@ -44,8 +38,6 @@ export async function POST(req: NextRequest) {
 
             Devuelve un análisis estructurado en formato JSON.
         `;
-
-		console.log("prompt", prompt);
 
 		// Llamada a OpenAI para analizar la transcripción
 		const response = await openai.chat.completions.create({
@@ -59,8 +51,6 @@ export async function POST(req: NextRequest) {
 
 		// Limpiar delimitadores de código si existen
 		const cleanedAnalysis = analysisRaw.replace(/```json|```/g, "").trim();
-
-		console.log("cleanedAnalysis", cleanedAnalysis);
 
 		return NextResponse.json({
 			transcription,
