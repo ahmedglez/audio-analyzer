@@ -189,48 +189,6 @@ export default function AudioAnalyzer() {
 		}
 	};
 
-	const handleReanalyze = async () => {
-		if (!results?.transcription || !results?.analysis) {
-			alert("No hay transcripción disponible para reanalizar.");
-			return;
-		}
-
-		setIsLoading(true);
-
-		try {
-			const requeriments = [
-				...predefinedRequirements
-					.filter((req) => req.selected)
-					.map((req) => req.text),
-				...customRequirements,
-			];
-
-			const formData = new FormData();
-			formData.append("apiKey", process.env.NEXT_PUBLIC_OPENAI_API_KEY || "");
-			formData.append("transcription", results.transcription);
-			formData.append("requirements", JSON.stringify(requeriments));
-
-			setStep(3);
-
-			const response = await fetch("/api/reanalyze", {
-				method: "POST",
-				body: formData,
-			});
-
-			if (!response.ok) {
-				throw new Error("Error al reanalizar la llamada.");
-			}
-
-			const newResults = await response.json();
-			setResults(newResults);
-		} catch (error) {
-			console.error("Error en la petición:", error);
-			alert("Ocurrió un error al procesar la solicitud.");
-		} finally {
-			setIsLoading(false);
-		}
-	};
-
 	const handleReset = () => {
 		setAudioFile(null);
 		setStep(1);
@@ -330,7 +288,7 @@ ${results.summary}
 				{step === 4 && results && (
 					<ResultsDisplay
 						results={results}
-						onReset={handleReanalyze}
+						onReset={handleReset}
 						onDownload={downloadReport}
 					/>
 				)}
