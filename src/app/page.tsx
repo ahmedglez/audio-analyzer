@@ -108,44 +108,39 @@ export default function AudioAnalyzer() {
 		try {
 			setProcessingStatus("transcribing");
 
-			// Simulamos un tiempo de procesamiento antes de enviar la solicitud
-			await new Promise((resolve) => setTimeout(resolve, 2000));
+			const formData = new FormData();
+			if (audioFile) formData.append("audio", audioFile);
+			formData.append("apiKey", userApiKey);
+			formData.append(
+				"requirements",
+				JSON.stringify([
+					...predefinedRequirements
+						.filter((req) => req.selected)
+						.map((req) => req.text),
+					...customRequirements,
+				])
+			);
 
-			setProcessingStatus("analyzing");
-
-			// Preparar los requerimientos para la API
-			const selectedPredefined = predefinedRequirements
-				.filter((req) => req.selected)
-				.map((req) => req.text);
-
-			const allRequirements = [...selectedPredefined, ...customRequirements];
-
-			// Llamada al endpoint con los requisitos y la API Key del usuario
 			const response = await fetch("/api/analyze-audio", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-					Authorization: `Bearer ${userApiKey}`, // Se asume que `userApiKey` está disponible en el contexto
-				},
-				body: JSON.stringify({ requirements: allRequirements }),
+				body: formData,
 			});
 
+			const data = await response.json();
+
 			if (!response.ok) {
-				throw new Error("Error en la solicitud al backend");
+				throw new Error(data.error || "Error al procesar el audio");
 			}
 
-			// Procesar la respuesta
-			const analysisResults = await response.json();
-
-			setProcessingStatus("summarizing");
-			await new Promise((resolve) => setTimeout(resolve, 1500));
-
-			// Guardamos los resultados y pasamos al siguiente paso
-			setResults(analysisResults);
+			setResults(data);
 			setStep(4);
 		} catch (error) {
-			console.error("Error en el procesamiento del audio:", error);
 			setProcessingStatus("error");
+			toast({
+				title: "Error",
+				description: (error as Error).message,
+				variant: "destructive",
+			});
 		}
 	};
 
@@ -225,7 +220,17 @@ ${results.summary}
 					/>
 				)}
 
-				{step === 3 && <ProcessingStatus status={processingStatus} />}
+				{step === 3 && (
+					<ProcessingStatus
+						status={processingStatus}
+						error={processingError}
+						progress={progress}
+						statusMessages={statusMessages}
+						elapsedTime={elapsedTime}
+						onRetry={handleRetry}
+						onCancel={handleReset}
+					/>
+				)}
 
 				{step === 4 && results && (
 					<ResultsDisplay

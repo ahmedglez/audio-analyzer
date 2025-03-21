@@ -3,28 +3,51 @@ import OpenAI from "openai";
 
 export async function POST(req: NextRequest) {
 	try {
-		const body = await req.json();
-		const { apiKey, requirements } = body;
+		const formData = await req.formData();
+		const file = formData.get("audio") as Blob;
+		const apiKey = formData.get("apiKey") as string;
+		const requirements = JSON.parse(formData.get("requirements") as string);
 
-		if (!apiKey || !requirements || !Array.isArray(requirements)) {
+		console.log("apiKey", apiKey);
+		console.log("file", file);
+		console.log("requirements", requirements);
+
+		if (!apiKey || !file || !requirements || !Array.isArray(requirements)) {
 			return NextResponse.json(
-				{ error: "apiKey y requirements son obligatorios" },
+				{ error: "apiKey, audio y requirements son obligatorios" },
 				{ status: 400 }
 			);
 		}
 
-		// Inicializar cliente de OpenAI con la API Key del usuario
 		const openai = new OpenAI({ apiKey });
 
-		// Construir el prompt para OpenAI con los requisitos proporcionados
+		// Convertir el archivo a un formato que OpenAI acepte
+		const audioFile = new File([file], "audio.mp3", { type: "audio/mpeg" });
+
+		// Transcribir el audio usando OpenAI
+		const transcriptionResponse = await openai.audio.transcriptions.create({
+			model: "whisper-1",
+			file: audioFile,
+		});
+
+		const transcription = transcriptionResponse.text;
+
+		console.log("transcription", transcription);
+
+		// Construir el prompt para OpenAI con los requisitos
 		const prompt = `
-            Tienes la transcripción de una llamada telefónica.
+            Tienes la siguiente transcripción de una llamada telefónica:
+            "${transcription}"
+
             Debes analizarla según los siguientes requisitos:
             ${requirements.map((req, index) => `${index + 1}. ${req}`).join("\n")}
+
             Devuelve un análisis estructurado en formato JSON.
         `;
 
-		// Llamada a OpenAI con el prompt
+		console.log("prompt", prompt);
+
+		// Llamada a OpenAI para analizar la transcripción
 		const response = await openai.chat.completions.create({
 			model: "gpt-4-turbo",
 			messages: [{ role: "system", content: prompt }],
@@ -32,16 +55,16 @@ export async function POST(req: NextRequest) {
 		});
 
 		// Obtener la respuesta generada
-		const analysis = response.choices[0]?.message?.content || "{}";
+		const analysisRaw = response.choices[0]?.message?.content || "{}";
 
-		// Simulación de una transcripción para la respuesta
-		const transcription =
-			"Este es un ejemplo de transcripción del audio subido...";
+		// Limpiar delimitadores de código si existen
+		const cleanedAnalysis = analysisRaw.replace(/```json|```/g, "").trim();
 
-		// Respuesta estructurada
+		console.log("cleanedAnalysis", cleanedAnalysis);
+
 		return NextResponse.json({
 			transcription,
-			analysis: JSON.parse(analysis), // Convertir la respuesta de OpenAI a JSON
+			analysis: JSON.parse(analysisRaw),
 			summary: "Resumen generado a partir del análisis de la llamada.",
 		});
 	} catch (error) {
