@@ -45,7 +45,9 @@ export default function AudioAnalyzer() {
 		},
 	]);
 	const [customRequirements, setCustomRequirements] = useState<string[]>([]);
-	const [processingStatus, setProcessingStatus] = useState<string>("");
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState<string | null>(null);
+
 	interface AnalysisResults {
 		transcription: string;
 		analysis: {
@@ -106,7 +108,7 @@ export default function AudioAnalyzer() {
 
 	const processAudio = async (userApiKey: string) => {
 		try {
-			setProcessingStatus("transcribing");
+			setIsLoading(true);
 
 			const formData = new FormData();
 			if (audioFile) formData.append("audio", audioFile);
@@ -135,12 +137,14 @@ export default function AudioAnalyzer() {
 			setResults(data);
 			setStep(4);
 		} catch (error) {
-			setProcessingStatus("error");
+			setError((error as Error).message);
 			toast({
 				title: "Error",
 				description: (error as Error).message,
 				variant: "destructive",
 			});
+		} finally {
+			setIsLoading(false);
 		}
 	};
 
@@ -148,7 +152,7 @@ export default function AudioAnalyzer() {
 		setAudioFile(null);
 		setStep(1);
 		setResults(null);
-		setProcessingStatus("");
+		setIsLoading(false);
 	};
 
 	const downloadReport = () => {
@@ -222,13 +226,9 @@ ${results.summary}
 
 				{step === 3 && (
 					<ProcessingStatus
-						status={processingStatus}
-						error={processingError}
-						progress={progress}
-						statusMessages={statusMessages}
-						elapsedTime={elapsedTime}
-						onRetry={handleRetry}
-						onCancel={handleReset}
+						isLoading={isLoading}
+						error={error}
+						onBack={() => setStep(2)}
 					/>
 				)}
 
