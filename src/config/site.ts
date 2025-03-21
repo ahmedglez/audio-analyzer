@@ -1,10 +1,10 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-	name: "Next.js",
-	title: "Next.js Starter Template",
-	description:
-		"Next.js starter template with TypseScript, ESLint, Prettier, Tailwind CSS, and Shadcn/ui",
+	name: "Audio Analyzer",
+	title: "Audio Analyzer",
+	description: "Análisis de audio para transcripción y análisis de contenido.",
+	url: "https://audio-analyzer-lilac.vercel.app/",
 	mainNav: [
 		{
 			title: "Home",
@@ -12,6 +12,6 @@ export const siteConfig = {
 		},
 	],
 	links: {
-		github: "https://github.com/AhmedBaset",
+		github: "https://www.linkedin.com/in/ahmedglez/",
 	},
 };

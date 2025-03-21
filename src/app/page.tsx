@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useEffect, useState } from "react";
@@ -7,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import AnalysisRequirements from "@/components/analysis-requirements";
 import AudioUploader from "@/components/audio-uploader";
 import ConfigModal from "@/components/config-modal";
+import Logo from "@/components/logo-component";
 import ProcessingStatus from "@/components/processing-status";
 import ResultsDisplay from "@/components/results-display";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -235,7 +237,7 @@ ${results.summary}
 	return (
 		<main className="container mx-auto max-w-4xl px-4 py-8">
 			<div className="mb-8 flex items-center justify-between">
-				<h1 className="text-3xl font-bold">Analizador de Calidad de Audio</h1>
+				<Logo />
 				<div className="flex items-center gap-2">
 					<ThemeToggle />
 					<Button
