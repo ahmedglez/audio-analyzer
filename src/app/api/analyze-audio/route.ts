@@ -3,6 +3,10 @@ import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
+export const maxDuration = 300000; // 5 minutes
+export const maxFileSize = 25 * 1024 * 1024; // 25 MB
+export const dynamic = "force-dynamic";
+
 const TranscriptionSchema = z.object({
 	transcription: z.string(),
 	analysis: z.object({
