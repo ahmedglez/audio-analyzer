@@ -1,10 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import OpenAI from "openai";
 import { zodResponseFormat } from "openai/helpers/zod";
+import Replicate from "replicate";
 import { z } from "zod";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
+
+const replicateApiKey = process.env.REPLICATE_API_KEY;
 
 const TranscriptionSchema = z.object({
 	transcription: z.string(),
@@ -48,23 +51,32 @@ export async function POST(req: NextRequest) {
 		}
 
 		const openai = new OpenAI({ apiKey });
+		const replicate = new Replicate({ auth: replicateApiKey });
 
 		// Convertir el archivo a un formato que OpenAI acepte
 		const audioFile = new File([file], "audio.mp3", { type: "audio/mpeg" });
 
-		// Transcribir el audio usando OpenAI
-		const transcriptionResponse = await openai.audio.transcriptions.create({
-			model: "whisper-1",
-			file: audioFile,
-			language: "es",
-		});
-
-		const rawTranscription = transcriptionResponse.text;
+		// Transcribir el audio usando Replicate
+		const transcription = await replicate.run(
+			"vaibhavs10/incredibly-fast-whisper:3ab86df6c8f54c11309d4d1f930ac292bad43ace52d10c80d87eb258b3c9f79c",
+			{
+				input: {
+					task: "transcribe",
+					audio:
+						"data:audio/mp3;base64," +
+						Buffer.from(await audioFile.arrayBuffer()).toString("base64"),
+					language: "None",
+					timestamp: "chunk",
+					batch_size: 64,
+					diarise_audio: false,
+				},
+			}
+		);
 
 		// Construir el prompt para formatear la transcripción y analizarla
 		const prompt = `
 Tienes la siguiente transcripción de una llamada telefónica:
-"${rawTranscription}"
+"${transcription}"
 
 **Tareas:**
 1. Reformatea la transcripción en estilo diálogo entre "Agente" y "Cliente".
