@@ -16,7 +16,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// Modificar la importación del tipo AIPlatform
+import type { AIConfig, AIPlatform } from "@/app/page";
 
 interface ConfigModalProps {
 	isOpen: boolean;
@@ -29,6 +32,8 @@ interface ConfigModalProps {
 	setPredefinedRequirements: (
 		requirements: Array<{ id: string; text: string; selected: boolean }>
 	) => void;
+	aiConfig: AIConfig;
+	setAIConfig: (config: AIConfig) => void;
 }
 
 export default function ConfigModal({
@@ -36,13 +41,10 @@ export default function ConfigModal({
 	onClose,
 	predefinedRequirements,
 	setPredefinedRequirements,
+	aiConfig,
+	setAIConfig,
 }: ConfigModalProps) {
-	const [apiKey, setApiKey] = useState("");
-	const [showApiKey, setShowApiKey] = useState(false);
-	const [hasExistingKey, setHasExistingKey] = useState(false);
-	const [activeTab, setActiveTab] = useState("api-key");
-
-	// Estado para edición de requisitos
+	// Estado para requisitos
 	const [requirements, setRequirements] = useState<
 		Array<{ id: string; text: string; selected: boolean }>
 	>([]);
@@ -50,56 +52,90 @@ export default function ConfigModal({
 	const [editingId, setEditingId] = useState<string | null>(null);
 	const [editingText, setEditingText] = useState("");
 
+	// Estado para configuración de IA
+	const [selectedPlatform, setSelectedPlatform] = useState<AIPlatform>(
+		aiConfig.platform
+	);
+	// Actualizar el estado de apiKeys para incluir solo OpenAI y Replicate
+	const [apiKeys, setApiKeys] = useState({
+		openai: aiConfig.apiKeys.openai || "",
+		replicate: aiConfig.apiKeys.replicate || "",
+	});
+
+	// Actualizar el estado de showApiKey
+	const [showApiKey, setShowApiKey] = useState({
+		openai: false,
+		replicate: false,
+	});
+
+	const [activeTab, setActiveTab] = useState("ai-platform");
+
 	const { toast } = useToast();
 
 	// Cargar datos al abrir el modal
 	useEffect(() => {
 		if (isOpen) {
-			// Cargar API Key
-			const storedKey = localStorage.getItem("openai-api-key");
-			if (storedKey) {
-				setApiKey(storedKey);
-				setHasExistingKey(true);
-			}
-
 			// Cargar requisitos
 			setRequirements([...predefinedRequirements]);
-		}
-	}, [isOpen, predefinedRequirements]);
 
-	// Guardar API Key
-	const saveApiKey = () => {
-		if (!apiKey.trim()) {
+			// Cargar configuración de IA
+			setSelectedPlatform(aiConfig.platform);
+			setApiKeys({
+				openai: aiConfig.apiKeys.openai || "",
+				replicate: aiConfig.apiKeys.replicate || "",
+			});
+		}
+	}, [isOpen, predefinedRequirements, aiConfig]);
+
+	// Guardar configuración de IA
+	const saveAIConfig = () => {
+		const currentKey = apiKeys[selectedPlatform];
+
+		if (!currentKey.trim()) {
 			toast({
 				title: "Error",
-				description: "Por favor, ingresa una API Key válida.",
+				description: `Por favor, ingresa una API Key válida para ${getPlatformName(selectedPlatform)}.`,
 				variant: "destructive",
 			});
 			return;
 		}
 
-		localStorage.setItem("openai-api-key", apiKey);
-		setHasExistingKey(true);
+		const newConfig: AIConfig = {
+			platform: selectedPlatform,
+			apiKeys: apiKeys,
+		};
+
+		setAIConfig(newConfig);
+
+		// Para compatibilidad con versiones anteriores
+		if (selectedPlatform === "openai") {
+			localStorage.setItem("openai-api-key", apiKeys.openai);
+		}
 
 		toast({
-			title: "API Key guardada",
-			description: "Tu API Key de OpenAI ha sido guardada correctamente.",
+			title: "Configuración guardada",
+			description: `La configuración de ${getPlatformName(selectedPlatform)} ha sido guardada correctamente.`,
 		});
 
-		if (activeTab === "api-key") {
+		if (activeTab === "ai-platform") {
 			onClose();
 		}
 	};
 
-	// Eliminar API Key
+	// Eliminar API Key de la plataforma seleccionada
 	const deleteApiKey = () => {
-		localStorage.removeItem("openai-api-key");
-		setApiKey("");
-		setHasExistingKey(false);
+		const updatedApiKeys = { ...apiKeys };
+		updatedApiKeys[selectedPlatform] = "";
+
+		setApiKeys(updatedApiKeys);
+
+		if (selectedPlatform === "openai") {
+			localStorage.removeItem("openai-api-key");
+		}
 
 		toast({
 			title: "API Key eliminada",
-			description: "Tu API Key de OpenAI ha sido eliminada.",
+			description: `La API Key de ${getPlatformName(selectedPlatform)} ha sido eliminada.`,
 		});
 	};
 
@@ -173,75 +209,139 @@ export default function ConfigModal({
 		setActiveTab(value);
 	};
 
+	// Función para obtener el nombre legible de la plataforma
+	const getPlatformName = (platform: AIPlatform): string => {
+		return platform === "openai" ? "OpenAI" : "Replicate";
+	};
+
+	// Función para obtener la URL de documentación de la plataforma
+	const getPlatformDocsUrl = (platform: AIPlatform): string => {
+		return platform === "openai"
+			? "https://platform.openai.com/api-keys"
+			: "https://replicate.com/account/api-tokens";
+	};
+
+	// Función para obtener el placeholder de la API key
+	const getApiKeyPlaceholder = (platform: AIPlatform): string => {
+		return platform === "openai" ? "sk-..." : "r8_...";
+	};
+
+	// Función para alternar la visibilidad de la API key
+	const toggleApiKeyVisibility = (platform: AIPlatform) => {
+		setShowApiKey((prev) => ({
+			...prev,
+			[platform]: !prev[platform],
+		}));
+	};
+
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-lg">
 				<DialogHeader>
 					<DialogTitle>Configuración</DialogTitle>
 					<DialogDescription>
-						Configura tu API Key y requisitos de análisis predefinidos.
+						Configura la plataforma de IA, API Keys y requisitos de análisis.
 					</DialogDescription>
 				</DialogHeader>
 
-				<Tabs defaultValue="api-key" onValueChange={handleTabChange}>
+				<Tabs defaultValue="ai-platform" onValueChange={handleTabChange}>
 					<TabsList className="grid w-full grid-cols-2">
-						<TabsTrigger value="api-key">API Key</TabsTrigger>
+						<TabsTrigger value="ai-platform">Plataforma IA</TabsTrigger>
 						<TabsTrigger value="requirements">Requisitos</TabsTrigger>
 					</TabsList>
 
-					<TabsContent value="api-key" className="space-y-6 py-4">
-						<div className="space-y-2">
-							<Label htmlFor="api-key">API Key de OpenAI</Label>
-							<div className="flex">
-								<div className="relative flex-1">
-									<Input
-										id="api-key"
-										type={showApiKey ? "text" : "password"}
-										placeholder="sk-..."
-										value={apiKey}
-										onChange={(e) => setApiKey(e.target.value)}
-										className="pr-10"
-									/>
-									<Button
-										type="button"
-										variant="ghost"
-										size="icon"
-										className="absolute right-0 top-0 h-full"
-										onClick={() => setShowApiKey(!showApiKey)}
-									>
-										{showApiKey ? (
-											<EyeOff className="size-4" />
-										) : (
-											<Eye className="size-4" />
-										)}
-									</Button>
-								</div>
+					<TabsContent value="ai-platform" className="space-y-6 py-4">
+						<div className="space-y-4">
+							{/* Reemplazar la sección de selección de plataforma en el TabsContent de "ai-platform" */}
+							<div>
+								<Label className="text-base font-medium">
+									Selecciona la plataforma de IA
+								</Label>
+								<RadioGroup
+									value={selectedPlatform}
+									onValueChange={(value) =>
+										setSelectedPlatform(value as AIPlatform)
+									}
+									className="mt-2 space-y-2"
+								>
+									<div className="flex items-center space-x-2">
+										<RadioGroupItem value="openai" id="openai" />
+										<Label htmlFor="openai" className="cursor-pointer">
+											OpenAI (GPT-4, GPT-3.5)
+										</Label>
+									</div>
+									<div className="flex items-center space-x-2">
+										<RadioGroupItem value="replicate" id="replicate" />
+										<Label htmlFor="replicate" className="cursor-pointer">
+											Replicate (Llama, Claude, etc.)
+										</Label>
+									</div>
+								</RadioGroup>
 							</div>
-							<p className="text-sm text-muted-foreground">
-								Tu API Key se almacenará localmente en tu navegador y no será
-								compartida.
-							</p>
-						</div>
 
-						<div className="flex flex-col space-y-2">
-							<div className="flex items-center text-sm text-muted-foreground">
-								<Key className="mr-2 size-4" />
-								<span>
-									Puedes obtener tu API Key en{" "}
-									<a
-										href="https://platform.openai.com/api-keys"
-										target="_blank"
-										rel="noopener noreferrer"
-										className="text-primary hover:underline"
-									>
-										platform.openai.com/api-keys
-									</a>
-								</span>
+							<div className="space-y-2 pt-2">
+								<Label
+									htmlFor={`${selectedPlatform}-api-key`}
+									className="text-base font-medium"
+								>
+									API Key de {getPlatformName(selectedPlatform)}
+								</Label>
+								<div className="flex">
+									<div className="relative flex-1">
+										<Input
+											id={`${selectedPlatform}-api-key`}
+											type={showApiKey[selectedPlatform] ? "text" : "password"}
+											placeholder={getApiKeyPlaceholder(selectedPlatform)}
+											value={apiKeys[selectedPlatform]}
+											onChange={(e) =>
+												setApiKeys({
+													...apiKeys,
+													[selectedPlatform]: e.target.value,
+												})
+											}
+											className="pr-10"
+										/>
+										<Button
+											type="button"
+											variant="ghost"
+											size="icon"
+											className="absolute right-0 top-0 h-full"
+											onClick={() => toggleApiKeyVisibility(selectedPlatform)}
+										>
+											{showApiKey[selectedPlatform] ? (
+												<EyeOff className="size-4" />
+											) : (
+												<Eye className="size-4" />
+											)}
+										</Button>
+									</div>
+								</div>
+								<p className="text-sm text-muted-foreground">
+									Tu API Key se almacenará localmente en tu navegador y no será
+									compartida.
+								</p>
+							</div>
+
+							<div className="flex flex-col space-y-2">
+								<div className="flex items-center text-sm text-muted-foreground">
+									<Key className="mr-2 size-4" />
+									<span>
+										Puedes obtener tu API Key en{" "}
+										<a
+											href={getPlatformDocsUrl(selectedPlatform)}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-primary hover:underline"
+										>
+											{getPlatformDocsUrl(selectedPlatform)}
+										</a>
+									</span>
+								</div>
 							</div>
 						</div>
 
 						<DialogFooter className="flex justify-between">
-							{hasExistingKey && (
+							{apiKeys[selectedPlatform] && (
 								<Button
 									variant="outline"
 									onClick={deleteApiKey}
@@ -255,7 +355,7 @@ export default function ConfigModal({
 								<Button variant="outline" onClick={onClose}>
 									Cancelar
 								</Button>
-								<Button onClick={saveApiKey} className="gap-1">
+								<Button onClick={saveAIConfig} className="gap-1">
 									<Save className="size-4" />
 									Guardar
 								</Button>

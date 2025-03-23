@@ -14,6 +14,33 @@ import ResultsDisplay from "@/components/results-display";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 
+// Modificar los tipos para limitar a solo OpenAI y Replicate
+export type AIPlatform = "openai" | "replicate";
+
+export interface AIConfig {
+	platform: AIPlatform;
+	apiKeys: {
+		openai: string;
+		replicate: string;
+	};
+}
+
+interface AnalysisResults {
+	transcription: string;
+	analysis: {
+		prohibitedWords: string[];
+		mentionedClientName: boolean;
+		clientObjections: string[];
+		offeredDiscount: boolean;
+		emotionalTone: string;
+		customAnalysis: Array<{
+			requirement: string;
+			result: string;
+		}>;
+	};
+	summary: string;
+}
+
 export default function AudioAnalyzer() {
 	const [step, setStep] = useState(1);
 	const [audioFile, setAudioFile] = useState<File | null>(null);
@@ -24,28 +51,22 @@ export default function AudioAnalyzer() {
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	interface AnalysisResults {
-		transcription: string;
-		analysis: {
-			prohibitedWords: string[];
-			mentionedClientName: boolean;
-			clientObjections: string[];
-			offeredDiscount: boolean;
-			emotionalTone: string;
-			customAnalysis: Array<{
-				requirement: string;
-				result: string;
-			}>;
-		};
-		summary: string;
-	}
-
 	const [results, setResults] = useState<AnalysisResults | null>(null);
 	const [isConfigOpen, setIsConfigOpen] = useState(false);
+
+	const [aiConfig, setAIConfig] = useState<AIConfig>({
+		platform: "openai",
+		apiKeys: {
+			openai: "",
+			replicate: "",
+		},
+	});
 	const { toast } = useToast();
 
 	// Cargar requisitos predefinidos desde localStorage al iniciar
+	// Cargar requisitos predefinidos y configuración de IA desde localStorage al iniciar
 	useEffect(() => {
+		// Cargar requisitos predefinidos
 		const savedRequirements = localStorage.getItem("predefined-requirements");
 		if (savedRequirements) {
 			try {
@@ -53,16 +74,36 @@ export default function AudioAnalyzer() {
 				setPredefinedRequirements(parsedRequirements);
 			} catch (e) {
 				console.error("Error al cargar requisitos predefinidos:", e);
-				// Si hay un error, inicializar con valores por defecto
 				initializeDefaultRequirements();
 			}
 		} else {
-			// Si no hay requisitos guardados, inicializar con valores por defecto
 			initializeDefaultRequirements();
+		}
+
+		// Cargar configuración de IA
+		const savedAIConfig = localStorage.getItem("ai-config");
+		if (savedAIConfig) {
+			try {
+				const parsedConfig = JSON.parse(savedAIConfig);
+				setAIConfig(parsedConfig);
+			} catch (e) {
+				console.error("Error al cargar configuración de IA:", e);
+			}
+		}
+
+		// Cargar API keys (para compatibilidad con versiones anteriores)
+		const openaiKey = localStorage.getItem("openai-api-key");
+		if (openaiKey && !savedAIConfig) {
+			setAIConfig((prev) => ({
+				...prev,
+				apiKeys: {
+					...prev.apiKeys,
+					openai: openaiKey,
+				},
+			}));
 		}
 	}, []);
 
-	// Función para inicializar con requisitos por defecto
 	const initializeDefaultRequirements = () => {
 		const defaultRequirements = [
 			{
@@ -98,7 +139,6 @@ export default function AudioAnalyzer() {
 		);
 	};
 
-	// Función para guardar requisitos en localStorage
 	const saveRequirements = (
 		requirements: Array<{ id: string; text: string; selected: boolean }>
 	) => {
@@ -107,6 +147,15 @@ export default function AudioAnalyzer() {
 			"predefined-requirements",
 			JSON.stringify(requirements)
 		);
+	};
+
+	const saveAIConfig = (config: AIConfig) => {
+		setAIConfig(config);
+		localStorage.setItem("ai-config", JSON.stringify(config));
+	};
+
+	const getPlatformName = (platform: AIPlatform): string => {
+		return platform === "openai" ? "OpenAI" : "Replicate";
 	};
 
 	const handleFileAccepted = (file: File) => {
@@ -163,6 +212,7 @@ export default function AudioAnalyzer() {
 					...customRequirements,
 				])
 			);
+			formData.append("platform", aiConfig.platform);
 
 			const response = await fetch("/api/analyze-audio", {
 				method: "POST",
@@ -295,6 +345,8 @@ ${results.summary}
 			</div>
 
 			<ConfigModal
+				aiConfig={aiConfig}
+				setAIConfig={saveAIConfig}
 				isOpen={isConfigOpen}
 				onClose={() => setIsConfigOpen(false)}
 				predefinedRequirements={predefinedRequirements}
