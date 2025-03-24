@@ -2,7 +2,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Settings } from "lucide-react";
+import Link from "next/link";
+import { HelpCircle, Settings } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 import AnalysisRequirements from "@/components/analysis-requirements";
@@ -304,6 +305,11 @@ ${results.summary}
 			<div className="mb-8 flex items-center justify-between">
 				<Logo />
 				<div className="flex items-center gap-2">
+					<Link href="/help">
+						<Button variant="outline" size="icon" aria-label="Ayuda">
+							<HelpCircle className="size-5" />
+						</Button>
+					</Link>
 					<ThemeToggle />
 					<Button
 						variant="outline"
