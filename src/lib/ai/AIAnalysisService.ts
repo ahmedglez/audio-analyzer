@@ -6,11 +6,6 @@ import { z } from "zod";
 const TranscriptionSchema = z.object({
 	transcription: z.string(),
 	analysis: z.object({
-		prohibitedWords: z.array(z.string()).optional(),
-		mentionedClientName: z.boolean(),
-		clientObjections: z.array(z.string()).optional(),
-		offeredDiscount: z.boolean(),
-		emotionalTone: z.string(),
 		customAnalysis: z.array(
 			z.object({
 				requirement: z.string(),
@@ -49,11 +44,6 @@ export class AIAnalysisService {
 {
   "transcription": "### Conversación\\n**Agente:** Hola, ¿cómo estás?\\n**Cliente:** Bien, gracias.",
   "analysis": {
-    "prohibitedWords": ["<palabra1>", "<palabra2>"],
-    "mentionedClientName": <true | false>,
-    "clientObjections": ["<objeción1>", "<objeción2>"],
-    "offeredDiscount": <true | false>,
-    "emotionalTone": "<tono general>",
     "customAnalysis": [
       {
         "requirement": "<nombre del requisito>",

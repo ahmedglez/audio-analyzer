@@ -4,7 +4,6 @@ import { Copy, Download, RefreshCw } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -78,74 +77,6 @@ export default function ResultsDisplay({
 				<TabsContent value="analysis" className="mt-4">
 					<Card className="bg-card">
 						<CardContent className="space-y-6 pt-6">
-							<div>
-								<h3 className="mb-3 text-lg font-medium">
-									Palabras prohibidas
-								</h3>
-								<div className="flex flex-wrap gap-2">
-									{results.analysis.prohibitedWords?.length > 0 ? (
-										results.analysis.prohibitedWords.map((word, index) => (
-											<Badge key={index} variant="destructive">
-												{word}
-											</Badge>
-										))
-									) : (
-										<p className="text-muted-foreground">
-											No se detectaron palabras prohibidas
-										</p>
-									)}
-								</div>
-							</div>
-
-							<div>
-								<h3 className="mb-3 text-lg font-medium">
-									Mención del nombre del cliente
-								</h3>
-								<Badge
-									variant={
-										results.analysis.mentionedClientName ? "default" : "outline"
-									}
-								>
-									{results.analysis.mentionedClientName ? "Sí" : "No"}
-								</Badge>
-							</div>
-
-							<div>
-								<h3 className="mb-3 text-lg font-medium">
-									Objeciones del cliente
-								</h3>
-								<ul className="list-disc space-y-1 pl-5">
-									{results.analysis.clientObjections?.map(
-										(objection, index) => <li key={index}>{objection}</li>
-									)}
-									{results.analysis.clientObjections?.length === 0 && (
-										<li className="text-muted-foreground">
-											No se detectaron objeciones
-										</li>
-									)}
-								</ul>
-							</div>
-
-							<div>
-								<h3 className="mb-3 text-lg font-medium">
-									Ofrecimiento de descuento
-								</h3>
-								<Badge
-									variant={
-										results.analysis.offeredDiscount ? "default" : "outline"
-									}
-								>
-									{results.analysis.offeredDiscount ? "Sí" : "No"}
-								</Badge>
-							</div>
-
-							<div>
-								<h3 className="mb-3 text-lg font-medium">Tono emocional</h3>
-								<p>
-									{results.analysis.emotionalTone ||
-										"No se detectó tono emocional"}
-								</p>
-							</div>
 							{results.analysis.customAnalysis &&
 								results.analysis.customAnalysis.length > 0 && (
 									<div>

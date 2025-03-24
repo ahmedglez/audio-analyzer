@@ -177,9 +177,6 @@ export default function AudioAnalyzer() {
 			);
 			formData.append("platform", aiConfig.platform);
 
-			//print all the form data attributes
-			console.info("form data attributes: ", formData);
-
 			const response = await fetch("/api/analyze-audio", {
 				method: "POST",
 				body: formData,
