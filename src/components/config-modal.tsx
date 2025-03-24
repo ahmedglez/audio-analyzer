@@ -1,17 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-	Edit2,
-	Eye,
-	EyeOff,
-	Info,
-	Key,
-	Plus,
-	Save,
-	Trash,
-	X,
-} from "lucide-react";
+import { Edit2, Eye, EyeOff, Info, Key, Save, Trash, X } from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -28,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import {
 	Tooltip,
 	TooltipContent,
@@ -382,21 +373,24 @@ export default function ConfigModal({
 						<div className="space-y-4">
 							<div>
 								<Label htmlFor="new-requirement">Añadir nuevo requisito</Label>
-								<div className="mt-1 flex">
-									<Input
+								<div className="mt-1 flex flex-col items-start space-y-2">
+									<Textarea
 										id="new-requirement"
 										placeholder="Escribe un nuevo requisito de análisis..."
 										value={newRequirement}
 										onChange={(e) => setNewRequirement(e.target.value)}
 										className="flex-1"
 									/>
-									<Button
-										onClick={addRequirement}
-										disabled={!newRequirement.trim()}
-										className="ml-2"
-									>
-										<Plus className="size-4" />
-									</Button>
+									<div className="flex w-full justify-end gap-1">
+										<Button
+											onClick={addRequirement}
+											className="gap-1"
+											variant={"outline"}
+											disabled={!newRequirement.trim()}
+										>
+											Añadir
+										</Button>
+									</div>
 								</div>
 							</div>
 
