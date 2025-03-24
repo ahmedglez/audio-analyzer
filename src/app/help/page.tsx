@@ -73,12 +73,22 @@ export default function HelpPage() {
 			</Card>
 
 			<Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-				<TabsList className="mb-4 grid grid-cols-5">
-					<TabsTrigger value="inicio">Inicio rápido</TabsTrigger>
-					<TabsTrigger value="configuracion">Configuración</TabsTrigger>
-					<TabsTrigger value="analisis">Análisis</TabsTrigger>
-					<TabsTrigger value="faq">Preguntas frecuentes</TabsTrigger>
-					<TabsTrigger value="desarrollador">Desarrollador</TabsTrigger>
+				<TabsList className="mb-4 flex w-full  justify-start overflow-x-auto whitespace-nowrap">
+					<TabsTrigger value="inicio" className="shrink-0">
+						Inicio rápido
+					</TabsTrigger>
+					<TabsTrigger value="configuracion" className="shrink-0">
+						Configuración
+					</TabsTrigger>
+					<TabsTrigger value="analisis" className="shrink-0">
+						Análisis
+					</TabsTrigger>
+					<TabsTrigger value="faq" className="shrink-0">
+						Preguntas frecuentes
+					</TabsTrigger>
+					<TabsTrigger value="desarrollador" className="shrink-0">
+						Desarrollador
+					</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="inicio" className="space-y-6">
