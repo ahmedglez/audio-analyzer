@@ -75,10 +75,7 @@ export default function AudioAnalyzer() {
 				setPredefinedRequirements(parsedRequirements);
 			} catch (e) {
 				console.error("Error al cargar requisitos predefinidos:", e);
-				initializeDefaultRequirements();
 			}
-		} else {
-			initializeDefaultRequirements();
 		}
 
 		// Cargar configuración de IA
@@ -104,41 +101,6 @@ export default function AudioAnalyzer() {
 			}));
 		}
 	}, []);
-
-	const initializeDefaultRequirements = () => {
-		const defaultRequirements = [
-			{
-				id: "prohibited",
-				text: "Identificar palabras prohibidas",
-				selected: false,
-			},
-			{
-				id: "clientName",
-				text: "Detectar si el agente mencionó el nombre del cliente",
-				selected: false,
-			},
-			{
-				id: "objections",
-				text: "Verificar si el cliente presentó objeciones",
-				selected: false,
-			},
-			{
-				id: "discount",
-				text: "Identificar si el agente ofreció un descuento",
-				selected: false,
-			},
-			{
-				id: "tone",
-				text: "Analizar el tono emocional de la llamada",
-				selected: false,
-			},
-		];
-		setPredefinedRequirements(defaultRequirements);
-		localStorage.setItem(
-			"predefined-requirements",
-			JSON.stringify(defaultRequirements)
-		);
-	};
 
 	const saveRequirements = (
 		requirements: Array<{ id: string; text: string; selected: boolean }>

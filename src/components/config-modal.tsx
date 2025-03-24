@@ -1,7 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Edit2, Eye, EyeOff, Key, Plus, Save, Trash, X } from "lucide-react";
+import {
+	Edit2,
+	Eye,
+	EyeOff,
+	Info,
+	Key,
+	Plus,
+	Save,
+	Trash,
+	X,
+} from "lucide-react";
 
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -18,6 +28,11 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 // Modificar la importación del tipo AIPlatform
 import type { AIConfig, AIPlatform } from "@/app/page";
 
@@ -386,7 +401,27 @@ export default function ConfigModal({
 							</div>
 
 							<div className="space-y-2">
-								<Label>Requisitos predefinidos</Label>
+								<Tooltip>
+									<TooltipTrigger asChild>
+										<div className="flex items-center space-x-2">
+											<Label>Requisitos predefinidos</Label>
+											<Info className="size-4" />
+										</div>
+									</TooltipTrigger>
+									<TooltipContent className="w-[300px]">
+										<p>
+											Los requisitos predefinidos son criterios establecidos que
+											facilitan el análisis de tareas y se envían a la
+											plataforma en cada solicitud, sin necesidad de ser
+											ingresados manualmente. Puedes añadir, editar y eliminar
+											requisitos predefinidos a tu gusto en cualquier momento.
+											<br />
+											<br />
+											Ejemplos de requisitos predefinidos: - Longitud mínima de
+											texto - Cantidad de palabras - Preguntas personalizadas
+										</p>
+									</TooltipContent>
+								</Tooltip>
 								{requirements.length === 0 ? (
 									<p className="py-2 text-sm text-muted-foreground">
 										No hay requisitos predefinidos. Añade algunos para facilitar
