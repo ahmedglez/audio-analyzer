@@ -52,17 +52,19 @@ export default function HelpPage() {
 						Acerca de la herramienta
 					</CardTitle>
 					<CardDescription>
-						El Analizador de Calidad de Audio es una herramienta diseñada para
-						evaluar conversaciones de servicio al cliente
+						Esta es una herramienta versátil diseñada para procesar y analizar
+						cualquier tipo de grabación de audio
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
 					<p className="text-muted-foreground">
 						Esta aplicación utiliza inteligencia artificial para transcribir y
-						analizar archivos de audio, identificando aspectos clave como el
-						tono emocional, objeciones del cliente, menciones de nombres, y
-						otros requisitos personalizados que definas. Puedes elegir entre
-						OpenAI o Replicate como motor de IA.
+						analizar archivos de audio según los requisitos específicos que
+						definas. Aunque surgió como una necesidad para evaluar llamadas de
+						atención al cliente, se ha desarrollado para ser una herramienta
+						flexible que puede analizar cualquier tipo de audio y responder a
+						preguntas personalizadas. Puedes elegir entre OpenAI o Replicate
+						como motor de IA.
 					</p>
 				</CardContent>
 			</Card>
@@ -262,8 +264,19 @@ export default function HelpPage() {
 								<div>
 									<p className="font-medium">Identificar palabras prohibidas</p>
 									<p className="text-sm text-muted-foreground">
-										Detecta si se utilizaron palabras o frases que no deberían
-										usarse en conversaciones con clientes.
+										Detecta si se utilizaron palabras o frases específicas que
+										podrías querer monitorear.
+									</p>
+								</div>
+							</div>
+
+							<div className="flex items-start gap-2">
+								<CheckCircle className="mt-0.5 size-5 text-green-500" />
+								<div>
+									<p className="font-medium">Detectar menciones de nombres</p>
+									<p className="text-sm text-muted-foreground">
+										Verifica si se mencionaron nombres específicos durante la
+										grabación.
 									</p>
 								</div>
 							</div>
@@ -272,11 +285,11 @@ export default function HelpPage() {
 								<CheckCircle className="mt-0.5 size-5 text-green-500" />
 								<div>
 									<p className="font-medium">
-										Detectar si el agente mencionó el nombre del cliente
+										Verificar objeciones o preocupaciones
 									</p>
 									<p className="text-sm text-muted-foreground">
-										Verifica si el agente se dirigió al cliente por su nombre
-										durante la conversación.
+										Identifica objeciones, preocupaciones o puntos de fricción
+										expresados durante la conversación.
 									</p>
 								</div>
 							</div>
@@ -285,11 +298,11 @@ export default function HelpPage() {
 								<CheckCircle className="mt-0.5 size-5 text-green-500" />
 								<div>
 									<p className="font-medium">
-										Verificar si el cliente presentó objeciones
+										Identificar ofertas o propuestas
 									</p>
 									<p className="text-sm text-muted-foreground">
-										Identifica las objeciones o preocupaciones expresadas por el
-										cliente durante la llamada.
+										Detecta si se ofrecieron descuentos, propuestas o soluciones
+										específicas.
 									</p>
 								</div>
 							</div>
@@ -297,25 +310,10 @@ export default function HelpPage() {
 							<div className="flex items-start gap-2">
 								<CheckCircle className="mt-0.5 size-5 text-green-500" />
 								<div>
-									<p className="font-medium">
-										Identificar si el agente ofreció un descuento
-									</p>
+									<p className="font-medium">Analizar el tono emocional</p>
 									<p className="text-sm text-muted-foreground">
-										Detecta si se ofreció algún tipo de descuento o compensación
-										al cliente.
-									</p>
-								</div>
-							</div>
-
-							<div className="flex items-start gap-2">
-								<CheckCircle className="mt-0.5 size-5 text-green-500" />
-								<div>
-									<p className="font-medium">
-										Analizar el tono emocional de la llamada
-									</p>
-									<p className="text-sm text-muted-foreground">
-										Evalúa el tono emocional general de la conversación y cómo
-										evolucionó durante la llamada.
+										Evalúa el tono emocional general y cómo evolucionó durante
+										la grabación.
 									</p>
 								</div>
 							</div>
@@ -337,24 +335,31 @@ export default function HelpPage() {
 							</h4>
 							<ul className="list-disc space-y-2 pl-5 text-sm">
 								<li>
-									Verificar si el agente siguió el guión establecido para este
-									tipo de casos
+									Analiza los principales temas tratados en esta entrevista y
+									resúmelos
 								</li>
 								<li>
-									Analizar si se resolvió el problema principal del cliente al
-									final de la llamada
+									Identifica las ideas clave presentadas en esta conferencia
 								</li>
 								<li>
-									Detectar si el agente ofreció productos adicionales o
-									servicios complementarios
-								</li>
-								<li>
-									Evaluar la claridad de la comunicación y el uso de lenguaje
+									Evalúa la claridad de la explicación y el uso de lenguaje
 									técnico
 								</li>
 								<li>
-									Identificar si se siguió el protocolo de despedida
-									correctamente
+									Extrae las preguntas realizadas durante la sesión y cómo
+									fueron respondidas
+								</li>
+								<li>
+									Analiza si el orador siguió una estructura lógica en su
+									presentación
+								</li>
+								<li>
+									Identifica las emociones predominantes expresadas por los
+									participantes
+								</li>
+								<li>
+									Para llamadas de servicio: Verifica si se siguió el protocolo
+									establecido
 								</li>
 							</ul>
 						</div>
@@ -434,8 +439,9 @@ export default function HelpPage() {
 								<ul className="list-disc space-y-1 pl-5">
 									<li>
 										<strong>OpenAI (GPT):</strong> Ofrece excelentes resultados
-										para análisis detallados de conversaciones en español y es
-										la opción predeterminada recomendada.
+										para análisis detallados de conversaciones y contenido
+										general en español. Es la opción predeterminada recomendada
+										para la mayoría de los casos.
 									</li>
 									<li>
 										<strong>Replicate:</strong> Proporciona acceso a modelos
@@ -545,6 +551,35 @@ export default function HelpPage() {
 								</ul>
 								Si el problema persiste, podría haber un problema con el
 								servicio de IA seleccionado.
+							</AccordionContent>
+						</AccordionItem>
+
+						<AccordionItem value="item-8">
+							<AccordionTrigger>
+								¿Para qué otros usos puedo utilizar esta herramienta?
+							</AccordionTrigger>
+							<AccordionContent>
+								<p className="mb-2">
+									Aunque la herramienta se desarrolló inicialmente para evaluar
+									llamadas de atención al cliente, puede utilizarse para
+									diversos propósitos:
+								</p>
+								<ul className="list-disc space-y-1 pl-5">
+									<li>
+										Análisis de entrevistas (periodísticas, de trabajo,
+										académicas)
+									</li>
+									<li>Evaluación de presentaciones y conferencias</li>
+									<li>Análisis de podcasts y contenido de audio</li>
+									<li>Transcripción y análisis de reuniones</li>
+									<li>Estudio de discursos y debates</li>
+									<li>Evaluación de material educativo en formato audio</li>
+									<li>Análisis de testimonios o relatos personales</li>
+								</ul>
+								<p className="mt-2">
+									La clave está en definir requisitos personalizados relevantes
+									para tu caso específico.
+								</p>
 							</AccordionContent>
 						</AccordionItem>
 					</Accordion>
