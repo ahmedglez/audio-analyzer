@@ -83,7 +83,7 @@ export default function ResultsDisplay({
 									Palabras prohibidas
 								</h3>
 								<div className="flex flex-wrap gap-2">
-									{results.analysis.prohibitedWords.length > 0 ? (
+									{results.analysis.prohibitedWords?.length > 0 ? (
 										results.analysis.prohibitedWords.map((word, index) => (
 											<Badge key={index} variant="destructive">
 												{word}
@@ -115,10 +115,10 @@ export default function ResultsDisplay({
 									Objeciones del cliente
 								</h3>
 								<ul className="list-disc space-y-1 pl-5">
-									{results.analysis.clientObjections.map((objection, index) => (
-										<li key={index}>{objection}</li>
-									))}
-									{results.analysis.clientObjections.length === 0 && (
+									{results.analysis.clientObjections?.map(
+										(objection, index) => <li key={index}>{objection}</li>
+									)}
+									{results.analysis.clientObjections?.length === 0 && (
 										<li className="text-muted-foreground">
 											No se detectaron objeciones
 										</li>

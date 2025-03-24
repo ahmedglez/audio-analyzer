@@ -154,23 +154,19 @@ export default function AudioAnalyzer() {
 		localStorage.setItem("ai-config", JSON.stringify(config));
 	};
 
-	const getPlatformName = (platform: AIPlatform): string => {
-		return platform === "openai" ? "OpenAI" : "Replicate";
-	};
-
 	const handleFileAccepted = (file: File) => {
 		setAudioFile(file);
 		setStep(2);
 	};
 
 	const handleRequirementsSubmit = () => {
-		const apiKey = localStorage.getItem("openai-api-key");
+		const currentPlatform = aiConfig.platform;
+		const apiKey = aiConfig.apiKeys[currentPlatform];
 
 		if (!apiKey) {
 			toast({
-				title: "API Key no configurada",
-				description:
-					"Por favor, configura tu API Key de OpenAI antes de continuar.",
+				title: `API Key de ${getPlatformName(currentPlatform)} no configurada`,
+				description: `Por favor, configura tu API Key de ${getPlatformName(currentPlatform)} antes de continuar.`,
 				variant: "destructive",
 			});
 			setIsConfigOpen(true);
@@ -196,6 +192,10 @@ export default function AudioAnalyzer() {
 		processAudio(apiKey);
 	};
 
+	const getPlatformName = (platform: AIPlatform): string => {
+		return platform === "openai" ? "OpenAI" : "Replicate";
+	};
+
 	const processAudio = async (userApiKey: string) => {
 		try {
 			setIsLoading(true);
@@ -213,6 +213,9 @@ export default function AudioAnalyzer() {
 				])
 			);
 			formData.append("platform", aiConfig.platform);
+
+			//print all the form data attributes
+			console.info("form data attributes: ", formData);
 
 			const response = await fetch("/api/analyze-audio", {
 				method: "POST",
