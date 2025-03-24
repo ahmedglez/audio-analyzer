@@ -1,68 +1,59 @@
-# Next.js Starter Template
+# Audio Analyzer
 
-This template is up to Next.js `13.5.3`. Please run `pnpm update --latest` after creating your project.
+**Audio Analyzer** es una herramienta diseñada para analizar la calidad de audios, inicialmente creada para evaluar llamadas de ventas según ciertos criterios. Con el tiempo, evolucionó en una solución flexible para diversas necesidades de análisis de audio.
 
-> [!NOTE]
-> BTW, [dependabot](https://docs.github.com/en/code-security/dependabot/dependabot-version-updates) is already configured in the template. this should keep the project up-to-date. Moreover, with your first push to github, It will open PRs to update the dependencies.
+## 🚀 Características
 
-[![CI-check](https://github.com/AhmedBaset/next-template/actions/workflows/CI.yml/badge.svg)](https://github.com/AhmedBaset/next-template/actions/workflows/CI.yml)
+- **Transcripción de audio:** Utiliza modelos avanzados de IA para convertir audio en texto.
+- **Análisis de contenido:** Evalúa el audio según criterios específicos definidos por el usuario.
+- **Opciones de procesamiento:** Permite elegir entre OpenAI (Whisper + GPT-4o-mini) y Replicate (Whisper optimizado + DeepSeek-R1).
+- **Interfaz moderna:** Construida con Next.js, Tailwind CSS y ShadCN/UI para una experiencia fluida y accesible.
+- **Optimización de costos y velocidad:** Soporte para múltiples modelos para un procesamiento más rápido y económico.
 
-## Create a new project
+## 🛠️ Tecnologías utilizadas
 
-Copy the command below and run it in your terminal let the magic happen.
+- **Frontend:** [Next.js](https://nextjs.org/), [Tailwind CSS](https://tailwindcss.com/), [ShadCN/UI](https://ui.shadcn.com/)
+- **Backend:** [OpenAI API](https://openai.com/), [Replicate API](https://replicate.com/)
+- **Despliegue:** [Fly.io](https://fly.io/)
+
+## 📦 Instalación y uso
+
+### Requisitos previos
+
+- Node.js >= 18
+
+### Instalación
 
 ```bash
-# with pnpm (recommended)
-pnpm create next-app -e https://github.com/AhmedBaset/next-template my-app
+# Clona el repositorio
+git clone https://github.com/tuusuario/audio-analyzer.git
+cd audio-analyzer
 
-# with npm
-npx create-next-app -e https://github.com/AhmedBaset/next-template my-app
+# Instala las dependencias
+pnpm install
 
-# with yarn
-yarn create next-app -e https://github.com/AhmedBaset/next-template my-app
+# Inicaliza el proyecto
+pnpm run dev
+
+
 ```
 
-> **Note**: When you use this template, VScode will prompt you to install recommended extensions and settings.
+## 📌 Roadmap y mejoras futuras
 
-## Features
+- 🔄 Selección de modelo específico: Actualmente se elige la plataforma, pero en el futuro se podrá seleccionar modelos individuales.
 
-- Next.js 13
-- TypeScript
-- Tailwind CSS
-- shadcn/ui & radix-ui
-- lucide-icons
-- dark/light mode
-- Environment variables type safety [Read more in `./env.mjs` file](./env.mjs)
-- Type safty for `next/link` href
-  > The experimental `typedRoutes` feature of Next.js is enabled by default. once you run `dev` or `build` command, Next.js will generate a link definition in `.next/types` that contains information about all existing routes in your application, which TypeScript can then use to provide feedback in your editor about invalid links. [Read more](https://nextjs.org/docs/app/building-your-application/configuring/typescript#statically-typed-links)
-- Github Action for checking formatting, linting and typechecking
-- VSCode recommended settings & extensions
-- ESLint
-- Prettier with sorting imports
-- Ready to use PWA [Read More in `next.config.js`](./next.config.js)
+- 📊 Reportes detallados: Generación de reportes de calidad basados en múltiples análisis.
 
-## Scripts
+- 🌎 Soporte para más idiomas: Expansión de los modelos para análisis en varios idiomas.
 
-This template uses `pnpm` as the package manager. If you want to use other package managers, you can delete `pnpm-lock.yaml` and run `npm install` or `yarn install`.
+## 🤝 Contribuciones
 
-- `dev`: Start the development server
-- `build`: Build for production
-- `start`: Start production server
-- `preview`: build and start production server
-- `lint`: Lint code
-- `format`: Format code
-- `format:check`: Check code formatting
-- `typecheck`: Check types
-- `ci-check`: Run all checks
+Si quieres contribuir al proyecto, ¡eres bienvenido! Puedes abrir issues o hacer pull requests con mejoras.
 
-### To install a component from `shadcn/ui` and `radix-ui`:
+## 📩 Contacto
 
-```sh
-pnpm shadcn-ui add <component> [--overwrite]
-```
+Si tienes ideas o feedback, puedes escribirme a [ahmediglez@gmail.com](mailto:ahmediglez@gmail.com) o conectar conmigo en [LinkedIn](https://www.linkedin.com/in/ahmediglez).
 
-## TODOs:
+## 🎯 Prueba la herramienta
 
-- [ ] Configure `next-auth`
-- [ ] Configure `Prisma`
-- [ ] Configure `Husky`, `lint-staged`
+👉 [Audio Analyzer](https://audio-analyzer.fly.dev) 🚀
