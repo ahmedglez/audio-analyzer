@@ -6,11 +6,14 @@ import {
 	AlertTriangle,
 	CheckCircle,
 	ChevronLeft,
+	Code,
 	Info,
+	Mail,
 	Settings,
 	Zap,
 } from "lucide-react";
 
+import { DeveloperInfo } from "@/components/developer-info";
 import { ThemeToggle } from "@/components/theme-toggle";
 import {
 	Accordion,
@@ -70,11 +73,12 @@ export default function HelpPage() {
 			</Card>
 
 			<Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
-				<TabsList className="mb-4 grid grid-cols-4">
+				<TabsList className="mb-4 grid grid-cols-5">
 					<TabsTrigger value="inicio">Inicio rápido</TabsTrigger>
 					<TabsTrigger value="configuracion">Configuración</TabsTrigger>
 					<TabsTrigger value="analisis">Análisis</TabsTrigger>
 					<TabsTrigger value="faq">Preguntas frecuentes</TabsTrigger>
+					<TabsTrigger value="desarrollador">Desarrollador</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="inicio" className="space-y-6">
@@ -583,6 +587,79 @@ export default function HelpPage() {
 							</AccordionContent>
 						</AccordionItem>
 					</Accordion>
+				</TabsContent>
+
+				<TabsContent value="desarrollador" className="space-y-6">
+					<h2 className="mb-4 text-2xl font-semibold">
+						Sobre el desarrollador
+					</h2>
+
+					<DeveloperInfo />
+
+					<div className="mt-8 space-y-4">
+						<h3 className="text-xl font-medium">Historia del proyecto</h3>
+						<p className="text-muted-foreground">
+							Esta heramienta comenzó como un proyecto para resolver una
+							necesidad específica: evaluar la calidad de las llamadas de
+							atención al cliente de manera eficiente y objetiva. Con el tiempo,
+							me di cuenta de que la misma tecnología podía aplicarse a una
+							variedad mucho más amplia de casos de uso.
+						</p>
+
+						<p className="text-muted-foreground">
+							La herramienta ha evolucionado para ser una solución versátil que
+							puede analizar cualquier tipo de contenido de audio, desde
+							entrevistas y podcasts hasta conferencias y material educativo. El
+							enfoque en requisitos personalizables permite que cada usuario
+							adapte el análisis a sus necesidades específicas.
+						</p>
+
+						<div className="mt-4 flex items-start gap-3 rounded-md bg-muted/50 p-4">
+							<Code className="mt-0.5 size-5 shrink-0 text-blue-500" />
+							<div>
+								<p className="font-medium">Tecnologías utilizadas</p>
+								<p className="text-sm text-muted-foreground">
+									Esta aplicación está construida con Next.js, React, Tailwind
+									CSS y shadcn/ui para el frontend. Para el procesamiento de
+									audio y análisis de IA, se integra con las APIs de OpenAI y
+									Replicate.
+								</p>
+							</div>
+						</div>
+					</div>
+
+					<div className="mt-6 border-t pt-6">
+						<h3 className="mb-4 text-xl font-medium">
+							Contratación y servicios
+						</h3>
+						<p className="mb-4 text-muted-foreground">
+							¿Necesitas una solución personalizada para el análisis de audio o
+							contenido? ¿O quizás estás buscando un desarrollador para tu
+							próximo proyecto? Estoy disponible para:
+						</p>
+
+						<ul className="mb-6 list-disc space-y-2 pl-5 text-muted-foreground">
+							<li>Desarrollo de aplicaciones web y móviles</li>
+							<li>Integración de soluciones de IA en productos existentes</li>
+							<li>
+								Consultoría en proyectos de análisis de datos y procesamiento de
+								lenguaje natural
+							</li>
+							<li>
+								Personalización de esta herramienta para necesidades específicas
+								de tu empresa
+							</li>
+						</ul>
+
+						<div className="flex justify-center">
+							<Button asChild className="gap-2">
+								<Link href="mailto:tu@email.com">
+									<Mail className="size-4" />
+									<span>Contactar para servicios profesionales</span>
+								</Link>
+							</Button>
+						</div>
+					</div>
 				</TabsContent>
 			</Tabs>
 		</main>

@@ -5,6 +5,7 @@ import { Metadata } from "next";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/lib/fonts";
 import { cn } from "@/lib/utils";
+import { Footer } from "@/components/footer";
 import { Providers } from "@/components/providers";
 
 export const metadata: Metadata = {
@@ -54,7 +55,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className={cn("min-h-screen antialiased", fontSans.className)}>
-				<Providers>{children}</Providers>
+				<Providers>
+					{children}
+					<Footer />
+				</Providers>
 			</body>
 		</html>
 	);
