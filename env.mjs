@@ -1,16 +1,15 @@
 // @ts-check
 
 import { createEnv } from "@t3-oss/env-nextjs";
-import { z } from "zod";
 
 export const env = createEnv({
-  server: {
-    // NEXTAUTH_SECRET: z.string().min(32),
-  },
-  client: {},
-  runtimeEnv: {
-    // NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
-  },
+	server: {
+		// NEXTAUTH_SECRET: z.string().min(32),
+	},
+	client: {},
+	runtimeEnv: {
+		// NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
+	},
 });
 
 /**
