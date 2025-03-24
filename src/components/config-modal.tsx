@@ -351,7 +351,7 @@ export default function ConfigModal({
 								<Button
 									variant="outline"
 									onClick={deleteApiKey}
-									className="gap-1"
+									className="mt-4 gap-1 md:mt-0 "
 								>
 									<Trash className="size-4" />
 									Eliminar
